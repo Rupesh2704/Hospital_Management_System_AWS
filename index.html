@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <style>
+        /* General styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #eef1f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+
+        .navbar div{
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .navbar button {
+            background: none;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0 0.5rem;
+            width: max-content;
+        }
+
+        .navbar button:hover{
+            color: #555;
+            background-color: #fff;
+        }
+
+        /* Main container */
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Card components */
+        .card {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin: 1rem 0;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 1rem;
+        }
+
+        /* Button styling */
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        /* Show currently active page */
+        .active {
+            display: block !important;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            word-wrap: break-word;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Footer styling */
+        .footer {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive table */
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    /* Hide table headers on small screens */
+    thead tr {
+        display: none;
+    }
+
+    /* Style each row as a card */
+    tbody tr {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        background-color: #fff;
+    }
+
+    /* Display each cell as a row */
+    td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border: none;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    /* Add labels to each cell on mobile */
+    td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        flex-basis: 50%;
+        color: #555;
+    }
+
+    /* Remove the border for the last cell */
+    td:last-child {
+        border-bottom: none;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Hospital Patient Records Management</h1>
+        <div>
+            <button onclick="showSection('searchSection')">Search Patient</button>
+            <button onclick="showSection('addPatientSection')">Add Patient</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Search Patient Page -->
+        <div class="card" id="searchSection">
+            <h2>Search Patients</h2>
+            <div class="form-group">
+                <label for="searchName">Search by Name</label>
+                <input type="text" id="searchName" placeholder="Enter patient name">
+            </div>
+            <div class="form-group">
+                <label for="filterIllness">Filter by Illness</label>
+                <input type="text" id="filterIllness" placeholder="Enter illness">
+            </div>
+            <button onclick="searchPatients()">Search</button>
+            <table id="patientsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Illness</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Add Patient Page -->
+        <div class="card" id="addPatientSection">
+            <h2>Add New Patient</h2>
+            <div class="form-group">
+                <label for="patientName">Patient Name</label>
+                <input type="text" id="patientName" placeholder="Enter patient name">
+            </div>
+            <div class="form-group">
+                <label for="patientAge">Patient Age</label>
+                <input type="number" id="patientAge" placeholder="Enter patient age">
+            </div>
+            <div class="form-group">
+                <label for="patientGender">Patient Gender</label>
+                <select id="patientGender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="patientIllness">Patient Illness</label>
+                <input type="text" id="patientIllness" placeholder="Enter patient illness">
+            </div>
+            <button onclick="addPatient()">Add Patient</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Hospital Management System</p>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const API_URL = 'https://uger00cvy9.execute-api.us-east-1.amazonaws.com/dev';
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));    // remove active class from all cards
+            document.getElementById(sectionId).classList.add('active'); // add active class to current card
+        }
+
+        function searchPatients() {
+            const name = document.getElementById('searchName').value;
+            const illness = document.getElementById('filterIllness').value;
+            const queryParams = new URLSearchParams();
+
+            if (name) queryParams.append('name', name);
+            if (illness) queryParams.append('illness', illness);
+
+            fetch(`${API_URL}?${queryParams.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Log the parsed patient data
+                    console.log("Parsed patient data:", data);
+                    
+                    const tableBody = document.querySelector("#patientsTable tbody");
+                    tableBody.innerHTML = "";
+                    data.forEach(patient => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = 
+                        `<td data-label="Name">${patient.Name}</td>
+                        <td data-label="Age">${patient.Age}</td>
+                        <td data-label="Gender">${patient.Gender}</td>
+                        <td data-label="Illness">${patient.Illness}</td>`;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error("Error fetching patients:", error));
+        }
+
+        function addPatient() {
+            const patient = {
+                Name: document.getElementById('patientName').value,
+                Age: document.getElementById('patientAge').value,
+                Gender: document.getElementById('patientGender').value,
+                Illness: document.getElementById('patientIllness').value
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(patient)
+            })
+                .then(response => response.json())
+                .then(() => {
+                    alert('Patient added successfully');
+                    searchPatients();
+                    showSection('searchSection');
+                })
+                .catch(err => console.error('Error adding patient:', err));
+        }
+
+        // Load Search page by default
+        window.onload = () => {
+            showSection('searchSection')
+            searchPatients();
+        };
+    </script>
+</body>
+
+</html>
